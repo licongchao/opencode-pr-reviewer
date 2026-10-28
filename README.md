@@ -42,7 +42,7 @@ steps:
    - uses: Barmore-Genc/opencode-pr-reviewer@v1
       with:
          model: openai/qwen-3.8-27b
-         provider-base-url: https://api.siemens.com/llm/v1
+         provider-base-url: https://api.openai.com/v1
 ```
 
 The action passes this as OpenCode's `baseURL`; OpenCode appends the chat completions path. Store the token in the `OPENAI_API_KEY` repository secret.
