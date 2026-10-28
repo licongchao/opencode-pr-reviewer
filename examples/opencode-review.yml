@@ -45,8 +45,8 @@ jobs:
       pull-requests: write
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # Set the env var that matches your model's provider (see README).
-      DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+      # OpenCode uses this key for the OpenAI-compatible endpoint.
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -61,6 +61,7 @@ jobs:
 
       - uses: Barmore-Genc/opencode-pr-reviewer@v1
         with:
-          model: deepseek/deepseek-v4-pro
+          model: openai/qwen-3.8-27b
+          provider-base-url: https://api.openai.com/v1
           pr-number: ${{ github.event.pull_request.number || github.event.issue.number }}
           user-comment: ${{ github.event.comment.body }}

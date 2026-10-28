@@ -31,11 +31,28 @@ The action calls `opencode run --model <model>`. opencode picks up provider cred
 
 For other providers, see the [opencode provider docs](https://opencode.ai/docs/providers/). Set whichever env var opencode expects in the `env:` block of the calling job, exactly as the example workflow does for `DEEPSEEK_API_KEY`.
 
+### OpenAI-compatible endpoints
+
+For an OpenAI-compatible endpoint, use the `openai/` model prefix, set `OPENAI_API_KEY`, and pass the endpoint base URL without `/chat/completions`:
+
+```yaml
+env:
+   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+steps:
+   - uses: Barmore-Genc/opencode-pr-reviewer@v1
+      with:
+         model: openai/qwen-3.8-27b
+         provider-base-url: https://api.siemens.com/llm/v1
+```
+
+The action passes this as OpenCode's `baseURL`; OpenCode appends the chat completions path. Store the token in the `OPENAI_API_KEY` repository secret.
+
 ## Action inputs
 
 | Input              | Required | Default                          | Notes |
 |--------------------|----------|----------------------------------|-------|
 | `model`            | yes      | —                                | e.g. `deepseek/deepseek-v4-pro`. |
+| `provider-base-url` | no       | `''`                             | Base URL for an OpenAI-compatible provider, without `/chat/completions`. |
 | `pr-number`        | yes      | —                                | Use <code>${{ github.event.pull_request.number &#124;&#124; github.event.issue.number }}</code>. |
 | `opencode-version` | no       | `''` (latest)                    | Passed to the installer as `OPENCODE_VERSION`. Pin for reproducibility. |
 | `user-comment`     | no       | `''`                             | Pass `${{ github.event.comment.body }}` so reviewer guidance after `/oc review` is forwarded to the model. |

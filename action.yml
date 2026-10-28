@@ -8,6 +8,10 @@ inputs:
   model:
     description: 'opencode model string, e.g. `deepseek/deepseek-v4-pro` or `anthropic/claude-sonnet-4-6`. The corresponding provider API key env var (e.g. `DEEPSEEK_API_KEY`, `ANTHROPIC_API_KEY`) must be set in the calling job''s env.'
     required: true
+  provider-base-url:
+    description: 'Optional OpenAI-compatible provider base URL, for example `https://api.siemens.com/llm/v1`. The provider API key must be set in the calling job''s env.'
+    required: false
+    default: ''
   pr-number:
     description: 'Pull request number to review.'
     required: true
@@ -58,6 +62,7 @@ runs:
       shell: bash
       env:
         REVIEW_FILE: ${{ inputs.review-file }}
+        PROVIDER_BASE_URL: ${{ inputs.provider-base-url }}
       run: |
         REVIEW_BASENAME=$(basename "$REVIEW_FILE")
         # Lock opencode down to a curated read-only surface plus a single
@@ -75,6 +80,19 @@ runs:
         cat > /tmp/opencode-config.json <<JSON
         {
           "\$schema": "https://opencode.ai/config.json",
+JSON
+        if [ -n "$PROVIDER_BASE_URL" ]; then
+          cat >> /tmp/opencode-config.json <<JSON
+          "provider": {
+            "openai": {
+              "options": {
+                "baseURL": "$PROVIDER_BASE_URL"
+              }
+            }
+          },
+JSON
+        fi
+        cat >> /tmp/opencode-config.json <<JSON
           "permission": {
             "bash": {
               "*":                 "deny",
